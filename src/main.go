@@ -53,14 +53,29 @@ func main() {
 	defer tex.Destroy()
 
 	pixels := make([]byte, winHeight*winWidth*4)
+	paddle1, ball, paddle2 := initializePong()
+	keyState := sdl.GetKeyboardState()
 
-	startPong(pixels)
+	running := true
+	for running {
+		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+			switch event.(type) {
+			case *sdl.QuitEvent:
+				println("Quit")
+				running = false
+				break
+			}
+		}
+		startPong(&paddle1, &ball, &paddle2, pixels, keyState)
 
-	tex.Update(nil, unsafe.Pointer(&pixels[0]), winWidth*4)
+		tex.Update(nil, unsafe.Pointer(&pixels[0]), winWidth*4)
 
-	renderer.Copy(tex, nil, nil)
-	renderer.Present()
-	holdThatWindowForMe()
+		renderer.Copy(tex, nil, nil)
+		renderer.Present()
+		sdl.Delay(16)
+	}
+
+	// holdThatWindowForMe()
 }
 
 func holdThatWindowForMe() {
